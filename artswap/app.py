@@ -4,7 +4,8 @@ Main application file for ArtSwap.
 
 import os
 from flask import Flask, render_template, redirect, url_for, flash, session, g, request, abort
-from flask_debugtoolbar import DebugToolbarExtension
+# Debug toolbar import removed to avoid dependency issues
+# from flask_debugtoolbar import DebugToolbarExtension
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import IntegrityError
 import uuid
@@ -23,13 +24,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgres
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+# Debug toolbar config removed
+# app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Make sure uploads folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-debug = DebugToolbarExtension(app)
+# Debug toolbar initialization removed
+# debug = DebugToolbarExtension(app)
 
 connect_db(app)
 
