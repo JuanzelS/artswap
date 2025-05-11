@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - ArtSwap{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Your Dashboard</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- User's Artwork -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Your Artwork</h4>
+                <a href="{{ url_for('new_art') }}" class="btn btn-sm btn-primary">Upload New Art</a>
+            </div>
+            <div class="card-body">
+                {% if user_art %}
+                <div class="row row-cols-1 row-cols-md-3 g-3">
+                    {% for art in user_art %}
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="/{{ art.image_url }}" class="card-img-top" alt="{{ art.title }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ art.title }}</h5>
+                                {% if art.description %}
+                                <p class="card-text small">{{ art.description|truncate(50) }}</p>
+                                {% endif %}
+                                <a href="{{ url_for('art_detail', id=art.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    You haven't uploaded any artwork yet. <a href="{{ url_for('new_art') }}">Upload your first piece!</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Trade History -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Trade History</h4>
+            </div>
+            <div class="card-body">
+                {% if trade_history %}
+                <div class="list-group">
+                    {% for trade in trade_history %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">
+                                {% if trade.sender_id == g.user.id %}
+                                You offered "{{ trade.offered_art.title }}" for "{{ trade.requested_art.title }}"
+                                {% else %}
+                                {{ trade.sender.username }} offered "{{ trade.offered_art.title }}" for your "{{ trade.requested_art.title }}"
+                                {% endif %}
+                            </h5>
+                            <small>
+                                {% if trade.is_accepted %}
+                                <span class="badge bg-success">Accepted</span>
+                                {% elif trade.is_rejected %}
+                                <span class="badge bg-danger">Rejected</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                        <small class="text-muted">{{ trade.updated_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    No past trades found.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Incoming Trade Requests -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Incoming Trade Requests</h4>
+            </div>
+            <div class="card-body">
+                {% if incoming_trades %}
+                <div class="list-group">
+                    {% for trade in incoming_trades %}
+                    <div class="list-group-item">
+                        <h5 class="mb-1">From {{ trade.sender.username }}</h5>
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <div class="card">
+                                    <img src="/{{ trade.offered_art.image_url }}" class="card-img-top" alt="{{ trade.offered_art.title }}">
+                                    <div class="card-body p-2">
+                                        <p class="card-text small">{{ trade.offered_art.title }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card">
+                                    <img src="/{{ trade.requested_art.image_url }}" class="card-img-top" alt="{{ trade.requested_art.title }}">
+                                    <div class="card-body p-2">
+                                        <p class="card-text small">{{ trade.requested_art.title }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <form action="{{ url_for('accept_trade', id=trade.id) }}" method="POST">
+                                <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                            </form>
+                            <form action="{{ url_for('reject_trade', id=trade.id) }}" method="POST">
+                                <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    No pending trade requests.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Outgoing Trade Requests -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Outgoing Trade Requests</h4>
+            </div>
+            <div class="card-body">
+                {% if outgoing_trades %}
+                <div class="list-group">
+                    {% for trade in outgoing_trades %}
+                    <div class="list-group-item">
+                        <h5 class="mb-1">To {{ trade.receiver.username }}</h5>
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <div class="card">
+                                    <img src="/{{ trade.offered_art.image_url }}" class="card-img-top" alt="{{ trade.offered_art.title }}">
+                                    <div class="card-body p-2">
+                                        <p class="card-text small">{{ trade.offered_art.title }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card">
+                                    <img src="/{{ trade.requested_art.image_url }}" class="card-img-top" alt="{{ trade.requested_art.title }}">
+                                    <div class="card-body p-2">
+                                        <p class="card-text small">{{ trade.requested_art.title }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <small class="text-muted">Sent on {{ trade.created_at.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    No pending outgoing trade requests.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
