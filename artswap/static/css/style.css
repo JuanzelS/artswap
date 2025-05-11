@@ -1,0 +1,57 @@
+/* ArtSwap Custom Styles */
+
+/* Main Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Card image thumbnail sizing */
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Dashboard */
+.list-group-item {
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+/* Art details page */
+.img-thumbnail {
+    height: 100px;
+    object-fit: cover;
+}
+
+/* Form styling */
+textarea.form-control {
+    min-height: 100px;
+}
+
+/* Custom buttons */
+.btn-primary {
+    background-color: #4e7dd1;
+    border-color: #4e7dd1;
+}
+
+.btn-primary:hover {
+    background-color: #3a68b7;
+    border-color: #3a68b7;
+}
+
+/* Trade cards */
+.trade-card {
+    transition: transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.trade-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer */
+footer {
+    margin-top: 5rem;
+}
