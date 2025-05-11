@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}ArtSwap - Trade Digital Art{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded mb-4">
+    <h1 class="display-4">Welcome to ArtSwap!</h1>
+    <p class="lead">ArtSwap is a platform for digital artists to share and trade their artwork with others.</p>
+    <hr class="my-4">
+    <p>Upload your digital art, browse creations from other artists, and propose trades to build your collection.</p>
+    {% if not g.user %}
+    <div class="mt-3">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('signup') }}" role="button">Sign Up</a>
+        <a class="btn btn-outline-primary btn-lg ms-2" href="{{ url_for('login') }}" role="button">Login</a>
+    </div>
+    {% else %}
+    <div class="mt-3">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('dashboard') }}" role="button">Go to Dashboard</a>
+        <a class="btn btn-success btn-lg ms-2" href="{{ url_for('new_art') }}" role="button">Upload Art</a>
+    </div>
+    {% endif %}
+</div>
+
+<h2 class="mb-4">Recently Added Artwork</h2>
+
+{% if recent_art %}
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for art in recent_art %}
+    <div class="col">
+        <div class="card h-100">
+            <img src="/{{ art.image_url }}" class="card-img-top" alt="{{ art.title }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ art.title }}</h5>
+                <p class="card-text">By {{ art.creator.username }}</p>
+                <a href="{{ url_for('art_detail', id=art.id) }}" class="btn btn-sm btn-primary">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    No artwork has been uploaded yet. Be the first to share your creation!
+</div>
+{% endif %}
+{% endblock %}
