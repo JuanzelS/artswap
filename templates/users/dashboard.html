@@ -39,6 +39,44 @@
             </div>
         </div>
 
+        <!-- Artwork Acquired Through Trades -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Artwork Acquired Through Trades</h4>
+            </div>
+            <div class="card-body">
+                {% set traded_art = user_art|selectattr('traded')|list %}
+                {% if traded_art %}
+                <div class="row row-cols-1 row-cols-md-3 g-3">
+                    {% for art in traded_art %}
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="/{{ art.image_url }}" class="card-img-top" alt="{{ art.title }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ art.title }}</h5>
+                                {% if art.description %}
+                                <p class="card-text small">{{ art.description|truncate(50) }}</p>
+                                {% endif %}
+                                <a href="{{ url_for('art_detail', id=art.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                {% if art.original_creator_id %}
+                                <p class="card-text small mt-2">
+                                    <span class="badge bg-info">Traded</span>
+                                    Originally by: {{ User.query.get(art.original_creator_id).username }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    You haven't acquired any artwork through trades yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
         <!-- Trade History -->
         <div class="card mb-4">
             <div class="card-header">

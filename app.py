@@ -321,7 +321,7 @@ def new_trade():
 
 @app.route('/trade/<int:id>/accept', methods=["POST"])
 def accept_trade(id):
-    """Accept a pending trade."""
+    """Accept a pending trade and transfer ownership of art pieces."""
     
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -339,11 +339,30 @@ def accept_trade(id):
         flash("This trade is no longer pending.", "warning")
         return redirect(url_for('dashboard'))
     
+    # Get the art pieces involved in the trade
+    sender_art = ArtPiece.query.get_or_404(trade.sender_art_id)
+    receiver_art = ArtPiece.query.get_or_404(trade.receiver_art_id)
+    
+    # Store original creators before swapping
+    sender_original_creator = sender_art.original_creator_id or sender_art.user_id
+    receiver_original_creator = receiver_art.original_creator_id or receiver_art.user_id
+    
+    # Transfer ownership
+    sender_art.original_creator_id = sender_original_creator
+    receiver_art.original_creator_id = receiver_original_creator
+    
+    # Swap the user_id values of the art pieces
+    sender_art.user_id, receiver_art.user_id = receiver_art.user_id, sender_art.user_id
+    
+    # Mark the pieces as traded
+    sender_art.traded = True
+    receiver_art.traded = True
+    
     # Update trade status
     trade.status = 'accepted'
     db.session.commit()
     
-    flash("Trade accepted!", "success")
+    flash("Trade accepted! The artwork ownership has been transferred.", "success")
     return redirect(url_for('dashboard'))
 
 
