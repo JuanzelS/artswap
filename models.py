@@ -76,6 +76,10 @@ class ArtPiece(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
+    # New fields for trade tracking
+    original_creator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    traded = db.Column(db.Boolean, default=False)
+    
     # Relationships for trades
     offered_in_trades = db.relationship('Trade',
                                       foreign_keys='Trade.sender_art_id',
@@ -85,6 +89,16 @@ class ArtPiece(db.Model):
                                         foreign_keys='Trade.receiver_art_id',
                                         backref='requested_art',
                                         lazy=True)
+    
+    def was_acquired_through_trade(self):
+        """Check if this art piece was acquired through trade."""
+        return self.traded
+    
+    def previous_owner(self):
+        """Get the previous owner of this artwork if it was traded."""
+        if self.original_creator_id:
+            return User.query.get(self.original_creator_id)
+        return None
     
     def __repr__(self):
         return f"<ArtPiece #{self.id}: {self.title}>"
