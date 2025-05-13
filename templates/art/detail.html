@@ -18,6 +18,19 @@
                 <div class="mt-3">
                     <small class="text-muted">Uploaded on {{ art.created_at.strftime('%Y-%m-%d') }}</small>
                 </div>
+                
+                {% if art.traded %}
+                <div class="mt-3 p-3 bg-light rounded">
+                    <p class="mb-0">
+                        <span class="badge bg-info">Traded Artwork</span>
+                        {% if art.original_creator_id %}
+                            <small class="text-muted">
+                                Originally created by {{ User.query.get(art.original_creator_id).username }}
+                            </small>
+                        {% endif %}
+                    </p>
+                </div>
+                {% endif %}
             </div>
         </div>
         
