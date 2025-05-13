@@ -19,8 +19,8 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
 
-# Get DB_URI from environ variable or default to development DB
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql:///artswap')
+# Use SQLite instead of PostgreSQL for easier setup
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///artswap.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
@@ -36,6 +36,9 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 connect_db(app)
 
+# Create tables
+with app.app_context():
+    db.create_all()
 
 ##############################################################################
 # User signup/login/logout
