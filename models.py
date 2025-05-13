@@ -21,7 +21,19 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
-    art_pieces = db.relationship('ArtPiece', backref='creator', lazy=True, cascade="all, delete-orphan")
+    # Keep using user_id but specify foreign_keys to avoid ambiguity
+    art_pieces = db.relationship('ArtPiece', 
+                                foreign_keys='ArtPiece.user_id',
+                                backref='owner', 
+                                lazy=True,
+                                cascade="all, delete-orphan")
+    
+    # Add relationship for original creations
+    original_creations = db.relationship('ArtPiece',
+                                       foreign_keys='ArtPiece.original_creator_id',
+                                       backref='creator',
+                                       lazy=True)
+    
     sent_trades = db.relationship('Trade', 
                                  foreign_keys='Trade.sender_id',
                                  backref='sender', 
@@ -73,11 +85,14 @@ class ArtPiece(db.Model):
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     image_url = db.Column(db.String(255), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # New fields for trade tracking
-    original_creator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    # Keep user_id for existing database compatibility
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # New field for original creator
+    original_creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     traded = db.Column(db.Boolean, default=False)
     
     # Relationships for trades
@@ -85,6 +100,7 @@ class ArtPiece(db.Model):
                                       foreign_keys='Trade.sender_art_id',
                                       backref='offered_art',
                                       lazy=True)
+                                      
     requested_in_trades = db.relationship('Trade',
                                         foreign_keys='Trade.receiver_art_id',
                                         backref='requested_art',
@@ -96,7 +112,7 @@ class ArtPiece(db.Model):
     
     def previous_owner(self):
         """Get the previous owner of this artwork if it was traded."""
-        if self.original_creator_id:
+        if self.original_creator_id and self.original_creator_id != self.user_id:
             return User.query.get(self.original_creator_id)
         return None
     

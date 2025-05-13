@@ -61,9 +61,7 @@
                                 {% if art.original_creator_id %}
                                 <p class="card-text small mt-2">
                                     <span class="badge bg-info">Traded</span>
-                                    Originally by: {{ User.query.get(art.original_creator_id).username }}
-                                </p>
-                                {% endif %}
+                                    Originally by: {{ art.original_creator.username if art.original_creator else "Unknown" }}                                {% endif %}
                             </div>
                         </div>
                     </div>

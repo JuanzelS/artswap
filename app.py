@@ -158,7 +158,7 @@ def dashboard():
         return redirect(url_for('login'))
         
     # Get user's artwork
-    user_art = ArtPiece.query.filter_by(user_id=g.user.id).all()
+    user_art = g.user.art_pieces
     
     # Get pending incoming trades
     incoming_trades = Trade.query.filter_by(
@@ -215,7 +215,8 @@ def new_art():
                 title=form.title.data,
                 description=form.description.data,
                 image_url=file_path,
-                user_id=g.user.id
+                user_id=g.user.id,
+                original_creator_id=g.user.id
             )
             
             db.session.add(art)
@@ -343,13 +344,12 @@ def accept_trade(id):
     sender_art = ArtPiece.query.get_or_404(trade.sender_art_id)
     receiver_art = ArtPiece.query.get_or_404(trade.receiver_art_id)
     
-    # Store original creators before swapping
-    sender_original_creator = sender_art.original_creator_id or sender_art.user_id
-    receiver_original_creator = receiver_art.original_creator_id or receiver_art.user_id
+    # Store original creators if not already set
+    if not sender_art.original_creator_id:
+        sender_art.original_creator_id = sender_art.user_id
     
-    # Transfer ownership
-    sender_art.original_creator_id = sender_original_creator
-    receiver_art.original_creator_id = receiver_original_creator
+    if not receiver_art.original_creator_id:
+        receiver_art.original_creator_id = receiver_art.user_id
     
     # Swap the user_id values of the art pieces
     sender_art.user_id, receiver_art.user_id = receiver_art.user_id, sender_art.user_id
@@ -404,4 +404,4 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001) 
+    app.run(debug=True, port=5001)

@@ -25,8 +25,7 @@
                         <span class="badge bg-info">Traded Artwork</span>
                         {% if art.original_creator_id %}
                             <small class="text-muted">
-                                Originally created by {{ User.query.get(art.original_creator_id).username }}
-                            </small>
+                                Originally created by {{ art.original_creator.username if art.original_creator else "Unknown" }}                            </small>
                         {% endif %}
                     </p>
                 </div>
